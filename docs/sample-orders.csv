@@ -1,0 +1,6 @@
+external_ref,customer_email,recipient_name,recipient_phone,address_line1,address_line2,city,postcode,delivery_date,slot,gift_message,items
+TEST-1001,sam@example.com,Jo Bloggs,07700900001,12 Rose Street,,Liverpool,L18 4QY,2026-10-09,standard,"Happy birthday, love Sam",Petals of Pink Joy:1:55.00
+TEST-1002,ali@example.com,Priya Shah,07700900002,3 Penny Lane,,Liverpool,L18 1DE,2026-10-09,morning,,Golden Sunshine:1:65.00;Chocolates:1:6.50
+TEST-1003,kim@example.com,Dave Holt,07700900003,88 Allerton Road,Flat 2,Liverpool,L18 2DG,2026-10-09,same_day,Thinking of you,Florist's Choice:2:50.00
+TEST-1004,lee@example.com,Mary Quinn,07700900004,5 Menlove Avenue,,Liverpool,L25 7SA,2026-10-09,standard,,Hamper Classic:1:65.00
+TEST-1005,tom@example.com,Ruth Evans,07700900005,21 Lark Lane,,Liverpool,L17 8UU,2026-10-09,standard,With sympathy,Sympathy Posy:1:60.00
