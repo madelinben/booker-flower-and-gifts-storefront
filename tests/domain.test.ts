@@ -54,3 +54,59 @@ describe('safeNextPath', () => {
     for (const bad of ['//evil.com', 'https://evil.com', '/\\evil', null]) expect(safeNextPath(bad)).toBe('/admin/orders');
   });
 });
+
+import { priceCart } from '~/domain/checkout/price-cart';
+import { signStripePayload, verifyStripeSignature } from '~/services/payments/stripe';
+
+describe('priceCart', () => {
+  const variants = new Map([[1, { id: 1, productName: 'Roses', label: 'Standard', pricePence: 5500 }]]);
+  it('prices from the database and adds the slot fee', () => {
+    expect(priceCart([{ variantId: 1, quantity: 2 }], variants, 'morning')).toMatchObject({ subtotalPence: 11000, deliveryPence: 1250, totalPence: 12250 });
+  });
+  it('rejects unknown variants', () => expect(priceCart([{ variantId: 9, quantity: 1 }], variants, 'standard')).toBeNull());
+});
+
+describe('stripe signature', () => {
+  it('accepts a valid signature and rejects tampering and replays', async () => {
+    const t = 1_800_000_000;
+    const sig = await signStripePayload('whsec_test', t, '{"a":1}');
+    const header = `t=${t},v1=${sig}`;
+    expect(await verifyStripeSignature('{"a":1}', header, 'whsec_test', t + 10)).toBe(true);
+    expect(await verifyStripeSignature('{"a":2}', header, 'whsec_test', t + 10)).toBe(false);
+    expect(await verifyStripeSignature('{"a":1}', header, 'whsec_test', t + 301)).toBe(false);
+    expect(await verifyStripeSignature('{"a":1}', null, 'whsec_test', t)).toBe(false);
+  });
+});
+
+import { assignSections, haversineKm, pathLengthKm, planRoute, splitEvenly } from '~/domain/route/route-planner';
+
+describe('route planner', () => {
+  const start = { lat: 0, lng: 0 };
+  const end = { lat: 0, lng: 0 };
+  it('haversine: one degree of latitude is ~111 km', () => expect(haversineKm({ lat: 0, lng: 0 }, { lat: 1, lng: 0 })).toBeCloseTo(111.19, 1));
+  it('visits stops along a line in order and beats a shuffled order', () => {
+    const stops = [4, 1, 3, 2].map((x) => ({ lat: 0, lng: x * 0.01 }));
+    const order = planRoute(start, stops, end);
+    expect(order.map((i) => stops[i].lng)).toEqual([0.01, 0.02, 0.03, 0.04]);
+    expect(pathLengthKm(start, order.map((i) => stops[i]), end)).toBeLessThan(pathLengthKm(start, stops, end));
+  });
+  it('handles zero and one stop', () => {
+    expect(planRoute(start, [], end)).toEqual([]);
+    expect(planRoute(start, [{ lat: 1, lng: 1 }], end)).toEqual([0]);
+  });
+  it('2-opt untangles a crossing', () => {
+    const stops = [{ lat: 0, lng: 1 }, { lat: 1, lng: 1 }, { lat: 1, lng: 0 }, { lat: 0, lng: 0.5 }];
+    const order = planRoute({ lat: 0, lng: 0 }, stops, { lat: 0, lng: 0 });
+    const best = Math.min(...[[0, 1, 2, 3], [3, 2, 1, 0], [3, 0, 1, 2], [2, 1, 0, 3]].map((o) => pathLengthKm({ lat: 0, lng: 0 }, o.map((i) => stops[i]), { lat: 0, lng: 0 })));
+    expect(pathLengthKm({ lat: 0, lng: 0 }, order.map((i) => stops[i]), { lat: 0, lng: 0 })).toBeLessThanOrEqual(best + 1e-6);
+  });
+  it('assigns sections from breaks and ignores stray breaks', () => {
+    expect(assignSections([{ type: 'break' }, { type: 'stop', id: 5 }, { type: 'stop', id: 6 }, { type: 'break' }, { type: 'break' }, { type: 'stop', id: 7 }, { type: 'break' }]))
+      .toEqual([{ id: 5, section: 1, position: 0 }, { id: 6, section: 1, position: 1 }, { id: 7, section: 2, position: 0 }]);
+  });
+  it('splits evenly', () => {
+    expect(splitEvenly([1, 2, 3, 4, 5], 2)).toEqual([[1, 2, 3], [4, 5]]);
+    expect(splitEvenly([1, 2], 5)).toEqual([[1], [2]]);
+    expect(splitEvenly([], 3)).toEqual([[]]);
+  });
+});

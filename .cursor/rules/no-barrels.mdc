@@ -5,7 +5,7 @@ alwaysApply: true
 
 # No barrels
 
-Import every public symbol from **its own file**. Never a folder `index`. Each component is a folder: `{Name}/{Name}.tsx` (or `.astro`).
+Import every public symbol from **its own file**. Never a folder `index`. Each component is a folder: `{Name}/{Name}.tsx`.
 
 ```ts
 // yes

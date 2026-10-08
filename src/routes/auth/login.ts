@@ -11,6 +11,7 @@ export const Route = createFileRoute('/auth/login')({
     handlers: {
       GET: async ({ request }) => {
         const env = getServerEnvironment();
+        if (!env.GOOGLE_CLIENT_ID || !env.SESSION_SECRET) return new Response('Staff sign-in is not configured on this environment.', { status: 503 });
         const url = new URL(request.url);
         const login = newLoginState(safeNextPath(url.searchParams.get('next')));
         setCookie(LOGIN_COOKIE, await sealLoginState(login, requireSetting(env.SESSION_SECRET, 'SESSION_SECRET')), {

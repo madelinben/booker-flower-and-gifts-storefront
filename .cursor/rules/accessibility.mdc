@@ -2,7 +2,7 @@
 description: Web accessibility
 globs:
   - **/*.tsx
-  - **/*.astro
+  - **/*.tsx
 alwaysApply: false
 ---
 

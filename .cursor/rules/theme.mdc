@@ -1,74 +1,29 @@
 ---
-description: Design token contract for the site — bubble/cartoon brand
+description: Visual language — tokens, type, motion, ladybird
 globs:
-  - **/*.{tsx,astro,css}
+  - **/*.{tsx,css}
 alwaysApply: false
 ---
 
 # Theme
 
-Tokens live in `src/styles/global.css`. No `tailwind.config.js` — Tailwind v4 is CSS-first. Palette is sampled from the `@chstr.runclub` Instagram profile picture (green-black ink `#0b1715`, white, lime dot `#c5d84a` — lime is an estimate from a 100px JPEG; refine from the original logo). Set once in `global.css`, referenced only by token — never raw hex in components.
+Tokens live in `src/styles/global.css` (Tailwind v4, no config file). Use token classes (`bg-background`, `text-primary`, `border-brass`), never raw hex in components.
 
-## Vibe
+| Token | Value | Use |
+|---|---|---|
+| `--background` | `#fbf7f2` cream | page |
+| `--foreground` / `--primary` | `#1f2f27` / `#1f3a2e` botanical green | text, primary buttons, footer |
+| `--accent` | `#b3202a` ladybird / awning red | CTAs, spots, focus ring |
+| `--blush` / `--rose` | `#f3dcd6` / `#c9707a` | petal washes, emphasis italics |
+| `--sage` | `#cfd9c8` | secondary text on green, done states |
+| `--brass` | `#b8935a` | hairlines, borders |
 
-Community, joy, inclusive, social. Bold type, thick ink outlines, bubble/pill shapes and sticker-style cards over a clean ink + lime + white base. Content stays legible first (WCAG AA — `accessibility.mdc`).
+Type: Cormorant Garamond (display; italic for emphasis) and Jost (body), both variable, self-hosted via `@fontsource-variable`. Headings are display, never uppercase-heavy.
 
-## Colour roles (shadcn-style token names)
+Motif: the **ladybird** (`src/components/Ladybird.tsx`, `public/favicon.svg`) is the logo mark; red spots echo the shop's red-spotted awning (`.awning` strip). Use it sparingly: header, footer, one hero perch, section divider, driver portal.
 
-| Role | Token |
-|---|---|
-| Brand fill | `--primary` / `--primary-foreground` |
-| Accent (panel dividers, highlights) | `--accent` / `--accent-foreground` |
-| Surface | `--card` / `--background` |
-| Muted background | `--muted` |
-| Border | `--border` |
-| Text | `--foreground` |
-| Secondary text | `--muted-foreground` |
-| Focus | `--ring` |
-| Error | `--destructive` + `--destructive-foreground` |
-| Success | `--success` + `--success-foreground` |
+Motion: CSS only, always inside `prefers-reduced-motion: no-preference`. Hit targets ≥ `min-h-10`.
 
-Prefer token utilities over raw hex. Muted status surfaces: `bg-destructive/10`, `bg-success/10`.
+Placeholder imagery is the `.bloom` gradient until real photography exists; replace via product `image_url`.
 
-## Spacing
-
-`--spacing: 0.25rem` (4px base). Page gutter 24 (`p-6`), section gap 24+ (`gap-6`), card padding 16 (`p-4`), inline gap 8 (`gap-2`).
-
-## Home hero: collage
-
-The landing hero is a full-viewport mosaic (`HeroCollage.astro`): six columns (four on phones) of tiles drifting up and down at different speeds, each column's tiles repeated twice for a seamless CSS loop, behind a radial ink scrim, with the logo plate centred and clean, then the H1, the one-line pitch, the when/where/cost chips and two CTAs. Motion is CSS only (`global.css`: `col-drift`, `tile-in`, `logo-pop`, `hero-rise`, `marquee`, `bubble-float`) and switches off under `prefers-reduced-motion`. The collage is decorative: tiles use `alt=""`, and the same facts are real text in the page.
-
-Supporting sections reuse the same language: ticker bands (`TickerBand`), step cards (`MondayPlan`), activity cards, a masonry gallery (`GalleryMosaic`), a merch strip, FAQ teaser, waiver panel and social band. Inner pages open with `PageBanner` (H1 + three tilted tiles).
-
-## Pictures: one manifest
-
-Every picture comes from `src/data/Gallery/gallery-tiles.ts` (`tiles`, `heroColumns`, `galleryTiles`). The shipped tiles are original illustrations in the bubble/cartoon style, not photos. To use real photos: add the file to `src/assets/gallery/` with a descriptive hyphenated name, import it in the manifest, replace the entry and write a real `alt` (who and what is in the picture). Astro makes AVIF/WebP at build. Keep hero tiles small in the collage (`width={360}`) and let `check:site` police sizes.
-
-## Layout signature
-
-Vertical panel dividers between page sections, revealed on scroll. One shared `PanelDivider` component in `features/site-shell`; every page section reuses it.
-
-## Hit area
-
-Interactive controls: `min-h-10` (40px). Adjacent hit areas must not overlap.
-
-## Motion
-
-- Press scale: `active:scale-[0.96]`
-- Timing: `cubic-bezier(0.2, 0, 0, 1)`
-- Never `transition: all` — list properties
-- Honour `prefers-reduced-motion` — reveals render in their final state when set
-- Enter: `opacity` + `translateY(12px)`, stagger ~100ms
-- Exit: subtler and shorter than enter
-- Skip enter animation on first paint above the fold — animate on scroll into view
-- Animations stay interruptible
-
-## Media and touch
-
-- `tabular-nums` on prices and counts
-- `touch-action: manipulation` on interactive controls
-- `overscroll-behavior: contain` inside overlays and dialogs
-
-## Typography
-
-Logo wordmark: heavy uppercase geometric sans, tight tracking, lime full stop, small widely-tracked `RUN & SOCIAL` beneath. Headings: Montserrat ExtraBold uppercase. Body: Inter. Both self-hosted via `@fontsource-variable/*`. The wordmark is HTML (`Logo.astro`), not an SVG `<img>`, so it uses the page font. `antialiased` on `<html>`. `text-balance` on headings, `text-pretty` on body.
+Palette is a designed interpretation; the live site exposes no CSS. Re-sample from owner-supplied logo/photos when available.

@@ -86,3 +86,9 @@ export async function updateOrderStatus(db: D1Database, id: number, from: OrderS
 export async function setOrderCoordinates(db: D1Database, id: number, lat: number, lng: number): Promise<void> {
   await db.prepare('UPDATE orders SET lat = ?1, lng = ?2 WHERE id = ?3').bind(lat, lng, id).run();
 }
+
+/** Admin shortcut: everything still being prepared for a delivery date becomes READY for the van. Returns rows moved. */
+export async function markDateReady(db: D1Database, date: string, now = new Date().toISOString()): Promise<number> {
+  const res = await db.prepare("UPDATE orders SET status = 'READY', updated_at = ?1 WHERE delivery_date = ?2 AND status IN ('PAID', 'PREPARING')").bind(now, date).run();
+  return res.meta.changes;
+}

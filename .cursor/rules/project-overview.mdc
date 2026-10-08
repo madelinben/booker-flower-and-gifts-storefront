@@ -3,54 +3,47 @@ description: Project objective, import law, on-demand rule table
 alwaysApply: true
 ---
 
-# chstr-run-and-social-cloudflare
+# booker-flowers-storefront
 
-Website for CHSTR Run & Social, a free, inclusive run and social club in Chester (Mondays 18:30, The Architect; running, football, netball, social nights). Visitors are new and existing runners. Every page earns its place by answering *when, where, free* fast, getting a new runner to the waiver, or selling merch with the least friction. Playful bubble/cartoon look, scroll-revealed vertical panels. Lowest possible running cost.
+Storefront, admin dashboard and delivery-driver portal for Booker Flowers & Gifts, an award-winning independent florist in Allerton, Liverpool that delivers with its own vans. Three sides in one TanStack Start app on Cloudflare Workers:
 
-## Workspaces & import law
+- **Storefront** (`/`, `/flowers`, `/product/$slug`, `/cart`): browse, choose delivery date and slot, pay with Stripe.
+- **Admin** (`/admin/*`, role `admin`): orders, CSV order import (test data until the daily fetch exists), products, staff.
+- **Driver portal** (`/driver/*`, role `driver` or `admin`): load the van, plan the shortest route, drag to reorder and split into sections, per-stop delivered/failed with note and photo. Status changes email the customer.
 
-- **App root (this folder)** — product: `src/pages/`, `src/features/`, `src/data/`, `src/domain/`, `src/content/`, `src/services/`, `src/stores/`, `src/utilities/`
-- No shared packages, no `packages/*` (single standalone app)
-- Products + FAQs: `src/content/` (Keystatic). Orders: Cloudflare D1. No separate CMS server
+Elegant florist look with a ladybird mark: cream, botanical green, blush and rose, brass hairlines, red-spotted awning accent. Lowest practical running cost.
 
-Layer boundaries + `import/no-cycle` in the lint config (`layers.mdc`):
+## Layout and import law
+
+- App root: `src/routes/` (thin TanStack file routes), `src/features/`, `src/components/`, `src/data/`, `src/domain/`, `src/services/`, `src/stores/`, `src/utilities/`. Alias `~/` → `src/`.
+- No shared packages, no `packages/*` (single standalone app).
+- Orders, catalogue, staff, routes: Cloudflare D1 (`migrations/`). Delivery photos: R2 bucket `PHOTOS`.
 
 ```
-page → feature, data, domain, services
+route → feature, data, domain, services
 data → domain, services
 domain → utilities (NOT data, NOT services)
-services → utilities
+services → domain types, utilities
 ```
 
-Feature folder (`src/features/<entity>-<objective>/`, noun-first: `product-browse` not `browse-products`): `models/ views/components/ hooks/ api/ utilities/ types/ tests/ config.ts`. Omit empty dirs. Route handlers in `src/pages/api/` stay thin; business rules in `domain/`.
+Server code runs only inside `createServerFn` handlers or server routes (`server.handlers`). Every server function and API route starts with `requireStaff(...)` unless it is public storefront data. Route `beforeLoad` guards (`guardRoute`) are UX; `requireStaff` is the security boundary.
 
-Canonical nouns: order, product, basket, session, waiver. Glossary: `docs/CONTEXT.md`.
-
-## Merchandise (KISS)
-
-No user accounts. Basket in `localStorage` (Nano Stores). Checkout = Stripe Checkout Session from `src/pages/api/`. Webhook `checkout.session.completed` inserts an order into D1. Order status is the five-value enum in `domain/order/`. Staff email on new `PAID_UNFULFILLED`.
-
-## Always-on web rules
-
-`seo.mdc` (metadata, Open Graph, schema.org) and `performance.mdc` (Core Web Vitals, bundle budgets) apply to every page and are enforced by `pnpm check:site` after `pnpm build`.
+Canonical nouns: order, product, variant, basket (UI) / cart (code), route, stop, section, driver. Glossary: `docs/ARCHITECTURE.md`.
 
 ## On-demand rules (read before touching matching paths)
 
 | File | Scope |
 |---|---|
-| `external-integrations.mdc` | Any Stripe / Resend call |
-| `database.mdc` | `src/data/**`, `src/content/**`, `migrations/**`, orders |
+| `external-integrations.mdc` | Any Stripe / Resend / Google call |
+| `database.mdc` | `src/data/**`, `migrations/**` |
 | `theme.mdc` | styles, tokens, motion |
 | `copy.mdc` | UI text |
-| `accessibility.mdc` | components, pages |
-| `interaction.mdc` | components, pages |
-| `error-pages.mdc` | 404 / 500 pages |
-| `testing.mdc` | tests, e2e |
-| `generated.mdc` | `generated/**` |
+| `accessibility.mdc` | components, routes |
+| `interaction.mdc` | components, routes |
+| `testing.mdc` | tests |
 
 ## Gates before merge
 
-- `pnpm check` green on every push (pre-push hook + CI + host build)
+- `pnpm check` green on every push (pre-push hook + CI)
 - `pnpm predeploy` green before merge
-- Sub-plan checkbox synced (if using the master/sub-plan SDLC flow)
-- After push: PR body filled from `.github/pull_request_template.md`
+- Commits and PRs: plain messages; no attribution trailers unless the owner asks

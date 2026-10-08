@@ -7,7 +7,6 @@ alwaysApply: true
 
 Never merge to `main` while `pnpm predeploy` is red. Same bar for any PR that should land on `main`.
 
-`pnpm predeploy` is the `pipeline` alias. Runs, in order: `pipeline:branch-base` → `typecheck` → `lint` → `test` → `build` → `check:site` → `test:e2e`.
 
 After the change set, run `pnpm predeploy`. Fix until it exits 0. Do not merge. Do not call the branch merge-ready while it is red.
 

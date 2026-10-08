@@ -10,7 +10,7 @@ export const fetchStaffList = createServerFn({ method: 'GET' }).handler(async ()
 });
 
 export const saveStaff = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ email: z.email(), role: z.enum(['admin', 'driver']), active: z.boolean() }))
+  .validator(z.object({ email: z.email(), role: z.enum(['admin', 'driver']), active: z.boolean() }))
   .handler(async ({ data }) => {
     const me = await requireStaff('admin');
     if (me.email.toLowerCase() === data.email.toLowerCase() && !data.active) throw new Error('You cannot deactivate yourself.');

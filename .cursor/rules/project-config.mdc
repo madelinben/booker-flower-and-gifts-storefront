@@ -1,16 +1,19 @@
 ---
-description: Stack-specific config — read docs/config after checking package.json deps
+description: Stack summary
 alwaysApply: true
 ---
 
 # Project config
 
-Before stack-specific work, read root `package.json` `dependencies`:
-
-| Dependency | Doc |
+| Concern | Choice |
 |---|---|
-| `astro` | `docs/config/astro.md` |
+| Framework | TanStack Start (React 19, file routes, server functions), Vite 8 |
+| Runtime | Cloudflare Workers via `@cloudflare/vite-plugin`; `wrangler.jsonc` |
+| Data | D1 binding `DB`, R2 binding `PHOTOS` |
+| Styling | Tailwind v4 (CSS-first tokens in `src/styles/global.css`), self-hosted `@fontsource` fonts |
+| Auth | Google OIDC (PKCE) → signed 8h session cookie; roles in D1 `staff` |
+| Payments | Stripe Checkout over `fetch`; webhook `/api/stripe-webhook` |
+| Maps | Google Geocoding + Static Maps (server-side key); route order by `domain/route/route-planner.ts` |
+| Email | Resend over `fetch` |
 
-Do not apply another stack's rules (`app/`, `next/image`, Server Actions) here.
-
-Per-project answers (stack, ports, origins, builder yes/no) live in `docs/CONFIG.md` § Stack.
+Secrets live in `.dev.vars` locally (git-ignored; template `.dev.vars.example`) and Worker secrets in production. Never read or print them.

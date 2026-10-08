@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
-import { changeOrderStatus, fetchOrder, fetchOrders } from '~/data/Order/order-actions';
+import { changeOrderStatus, fetchOrder, fetchOrders, readyDate } from '~/data/Order/order-actions';
 import type { OrderDetail } from '~/data/Order/order-dal';
 import { SLOT_LABEL } from '~/domain/delivery/delivery-rules';
 import { ORDER_STATUS_LABEL, ORDER_STATUSES } from '~/domain/order/order-status';
@@ -47,6 +47,7 @@ function Orders() {
             {ORDER_STATUSES.map((s) => <option key={s} value={s}>{ORDER_STATUS_LABEL[s]}</option>)}
           </select>
         </label>
+        {date && <button type="button" onClick={async () => { await readyDate({ data: { date } }); await router.invalidate(); }} className="min-h-10 rounded-full border border-brass px-4 text-sm hover:border-accent hover:text-accent">Mark {date} orders ready for the van</button>}
       </form>
       <div className="mt-6 overflow-x-auto">
         <table className="w-full min-w-[40rem] text-left text-sm">

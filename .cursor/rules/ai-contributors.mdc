@@ -36,11 +36,11 @@ Keep rules under `.cursor/rules/` only. Never create per-tool copies (`.v0/`, `.
 
 Changes to these need explicit reviewer sign-off, whoever (or whatever) wrote them:
 
-`package.json`, lockfile, `wrangler.toml`, `.github/**`, `.githooks/**`, `eslint.config.*`, `tsconfig*.json`, framework config (`astro.config.*`), `.env.example`, `.cursor/rules/**`.
+`package.json`, lockfile, `wrangler.jsonc`, `.github/**`, `.githooks/**`, `eslint.config.*`, `tsconfig*.json`, framework config (`vite.config.ts`), `.env.example`, `.cursor/rules/**`.
 
 ## Specifics
 
-- Keep the repo's own framework config (Astro). Do not scaffold a second framework.
-- Dev port is fixed (Astro `4321`, `strictPort`) and Playwright must match.
+- Keep the repo’s own framework config (TanStack Start). Do not scaffold a second framework.
+- Dev port is 5173 and Playwright must match.
 - Lovable / v0: no (`docs/CONFIG.md`). Their commits would bypass `check`.
 - After an AI session, expect: unused imports, inline styles, `any`, duplicated components. `lint:fix` + `check` catches most; review the rest against `general.mdc`.

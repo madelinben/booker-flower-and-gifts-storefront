@@ -7,11 +7,11 @@ import { getServerEnvironment } from '~/services/environment/server-environment'
 export const fetchCategories = createServerFn({ method: 'GET' }).handler(() => listCategories(getServerEnvironment().DB));
 
 export const fetchProducts = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ category: z.string().optional() }))
+  .validator(z.object({ category: z.string().optional() }))
   .handler(({ data }) => listProducts(getServerEnvironment().DB, data));
 
 export const fetchProduct = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ slug: z.string() }))
+  .validator(z.object({ slug: z.string() }))
   .handler(({ data }) => getProduct(getServerEnvironment().DB, data.slug));
 
 export const fetchAdminProducts = createServerFn({ method: 'GET' }).handler(async () => {
@@ -20,7 +20,7 @@ export const fetchAdminProducts = createServerFn({ method: 'GET' }).handler(asyn
 });
 
 export const fetchAdminProduct = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ slug: z.string() }))
+  .validator(z.object({ slug: z.string() }))
   .handler(async ({ data }) => {
     await requireStaff('admin');
     return getProduct(getServerEnvironment().DB, data.slug, true);
@@ -37,7 +37,7 @@ const productInput = z.object({
 });
 
 export const saveAdminProduct = createServerFn({ method: 'POST' })
-  .inputValidator(productInput)
+  .validator(productInput)
   .handler(async ({ data }) => {
     await requireStaff('admin');
     await saveProduct(getServerEnvironment().DB, data);

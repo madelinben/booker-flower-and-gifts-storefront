@@ -79,7 +79,7 @@ export interface CsvImportPreview { orders: CsvOrder[]; errors: CsvRowError[] }
 
 /** Header row required; column order free. `line` is 1-based including the header, as in a spreadsheet. */
 export function parseOrdersCsv(text: string): CsvImportPreview {
-  const [header, ...body] = parseCsv(text.replace(/^﻿/, ''));
+  const [header, ...body] = parseCsv(text.replace(/^\uFEFF/, ''));
   if (!header) return { orders: [], errors: [{ line: 1, message: 'File is empty.' }] };
   const columns = header.map((h) => h.trim().toLowerCase());
   const orders: CsvOrder[] = [];

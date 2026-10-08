@@ -1,23 +1,23 @@
 ## Summary
 
 ## App
-<!-- chstr-run-and-social-cloudflare, chstr-run-and-social-shopify, or both -->
+<!-- storefront, admin, driver portal, or infra -->
 
 ## Scope
-<!-- Layers, routes, CMS fields / Storefront queries, env vars, payment-provider or auth changes -->
+<!-- Layers, routes, D1 migrations, env vars, payment-provider or auth changes -->
 
 ## Dev test plan
-<!-- Local URLs; Cloudflare: provider test mode (Stripe test card, `stripe listen`, or the mock provider); Shopify: test order path; user path -->
+<!-- Local URLs -->
 
 ## Reviewer checklist
 - [ ] Correct layer, no forbidden imports, no new barrels
-- [ ] `pnpm check` green in each changed app
-- [ ] `pnpm predeploy` green in each changed app (includes `check:site`: SEO, schema.org, size budgets)
+- [ ] `pnpm check` green
+- [ ] `pnpm predeploy` green
 - [ ] Copy follows `copy.mdc`; accessible per `accessibility.mdc`
-- [ ] New env var added to the app's `.env.example` and `docs/CONFIG.md`
+- [ ] New env var added to `.dev.vars.example` and `.dev.vars.example`
 
 ## Infra / deploy config
-<!-- N/A, or Cloudflare Workers / DNS / env / webhook endpoint change; Shopify app scope change -->
+<!-- N/A, or Cloudflare Workers / DNS / env / webhook endpoint change -->
 
 ## Deployment plan
 Preview deployment → check preview URL → merge → production deploy on `main`.

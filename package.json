@@ -10,7 +10,17 @@
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:migrate:local": "wrangler d1 migrations apply booker-orders --local"
+    "db:migrate:local": "wrangler d1 migrations apply booker-orders --local",
+    "setup": "pnpm install && node scripts/setup-git-hooks.mjs",
+    "setup:hooks": "node scripts/setup-git-hooks.mjs",
+    "postinstall": "node scripts/setup-git-hooks.mjs",
+    "lint:fix": "eslint . --fix",
+    "check:entry-files": "node scripts/check-entry-files.mjs",
+    "check": "pnpm check:entry-files && pnpm lint:fix && pnpm lint && pnpm typecheck",
+    "pipeline": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "predeploy": "pnpm pipeline",
+    "db:migrate": "wrangler d1 migrations apply booker-orders --remote",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -37,7 +47,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "eslint": "^10.12.0",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.3",
     "vitest": "^5.0.3",

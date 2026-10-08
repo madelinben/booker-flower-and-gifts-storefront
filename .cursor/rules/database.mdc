@@ -9,7 +9,7 @@ alwaysApply: false
 ---
 
 **Where things live**
-- Products + FAQs: Astro content collections in `src/content/` (schema in `src/content.config.ts`). Staff edit through the Keystatic UI; every change is a git commit that rebuilds the site.
+- Products, variants and categories live in D1 (admin-edited). No git-based CMS.
 - Orders: Cloudflare D1 (SQLite), binding `DB`. Only `src/services/db/` touches the binding; `data/*/dal` call it.
 - Payment truth: Stripe. Fulfilment truth: D1 `orders.status`.
 

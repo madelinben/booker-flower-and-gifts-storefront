@@ -2,7 +2,7 @@
 description: User-facing copy
 globs:
   - **/*.tsx
-  - **/*.astro
+  - **/*.tsx
 alwaysApply: false
 ---
 

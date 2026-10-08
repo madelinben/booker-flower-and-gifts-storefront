@@ -16,7 +16,7 @@ export const Route = createRootRoute({
   component: Root,
 });
 
-const nav = ['Flowers', 'Occasions', 'Gifts', 'Christmas', 'Funerals', 'Corporate', 'Flower School'];
+const nav = [['/flowers', 'Flowers'], ['/delivery', 'Delivery'], ['/contact', 'Contact'], ['/cart', 'Basket']] as const;
 
 function Root() {
   return (
@@ -33,7 +33,7 @@ function Root() {
             <span>Booker <span className="block text-[0.7rem] not-italic tracking-[0.35em] text-muted uppercase">Flowers &amp; Gifts</span></span>
           </Link>
           <nav aria-label="Main" className="flex flex-wrap gap-x-6 gap-y-2 text-sm tracking-wide">
-            {nav.map((n) => <a key={n} href={`#${n.toLowerCase().replace(' ', '-')}`} className="min-h-10 content-center hover:text-accent">{n}</a>)}
+            {nav.map(([to, label]) => <Link key={to} to={to} className="min-h-10 content-center hover:text-accent" activeProps={{ className: 'text-accent' }}>{label}</Link>)}
           </nav>
         </header>
         <main><Outlet /></main>

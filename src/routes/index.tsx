@@ -1,24 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { fetchCategories, fetchProducts } from '~/data/Catalog/catalog-actions';
+import { ProductCard } from '~/features/ProductCard';
 import { Ladybird } from '~/components/Ladybird';
 
-export const Route = createFileRoute('/')({ component: Home });
-
-const categories = [
-  ['Hand-tied bouquets', 'from £50'],
-  ['Vase arrangements', 'ready to display'],
-  ['Gift hampers', 'from £65'],
-  ['Subscriptions', 'weekly · fortnightly · monthly'],
-] as const;
-
-const featured = [
-  ['Petals of Pink Joy', '£55'],
-  ['Golden Sunshine', '£65'],
-  ['Florist’s Choice', '£50'],
-] as const;
-
-const occasions = ['Birthday', 'Anniversary', 'Thank you', 'Congratulations', 'New baby', 'Sympathy'];
+export const Route = createFileRoute('/')({
+  loader: async () => ({ products: (await fetchProducts({ data: {} })).slice(0, 3), categories: await fetchCategories() }),
+  component: Home,
+});
 
 function Home() {
+  const { products, categories } = Route.useLoaderData();
+  const types = categories.filter((c) => c.kind === 'type').slice(0, 4);
+  const occasions = categories.filter((c) => c.kind === 'occasion');
   return (
     <>
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
@@ -27,8 +20,8 @@ function Home() {
           <h1 className="mt-5 text-5xl text-primary md:text-7xl">Flowers arranged by hand, <em className="text-rose">delivered by us.</em></h1>
           <p className="mt-6 max-w-md text-lg text-muted">Seasonal bouquets and gifts, made in our Liverpool studio and hand-delivered in our own vans — with a photograph on the doorstep.</p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <a href="#flowers" className="min-h-11 content-center rounded-full bg-primary px-8 text-sm tracking-widest text-primary-foreground uppercase hover:bg-accent">Shop flowers</a>
-            <a href="#delivery" className="min-h-11 content-center rounded-full border border-brass px-8 text-sm tracking-widest uppercase hover:border-accent hover:text-accent">Delivery details</a>
+            <Link to="/flowers" search={{}} className="min-h-11 content-center rounded-full bg-primary px-8 text-sm tracking-widest text-primary-foreground uppercase hover:bg-accent">Shop flowers</Link>
+            <Link to="/delivery" className="min-h-11 content-center rounded-full border border-brass px-8 text-sm tracking-widest uppercase hover:border-accent hover:text-accent">Delivery details</Link>
           </div>
         </div>
         <div className="relative">
@@ -40,13 +33,12 @@ function Home() {
       <section id="flowers" className="mx-auto max-w-6xl px-4 pt-12">
         <h2 className="text-4xl text-primary">Shop by style</h2>
         <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map(([name, note]) => (
-            <li key={name}>
-              <a href="#" className="lift block rounded-2xl border border-border bg-white/60 p-6">
+          {types.map((c) => (
+            <li key={c.slug}>
+              <Link to="/flowers" search={{ category: c.slug }} className="lift block rounded-2xl border border-border bg-white/60 p-6">
                 <span className="bloom block aspect-square rounded-xl" aria-hidden />
-                <span className="mt-4 block font-display text-2xl text-primary">{name}</span>
-                <span className="text-sm text-muted">{note}</span>
-              </a>
+                <span className="mt-4 block font-display text-2xl text-primary">{c.name}</span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -55,16 +47,10 @@ function Home() {
       <section className="mx-auto mt-20 max-w-6xl px-4">
         <div className="flex items-end justify-between border-b hairline pb-3">
           <h2 className="text-4xl text-primary">This week’s favourites</h2>
-          <a href="#" className="text-sm tracking-widest uppercase hover:text-accent">View all</a>
+          <Link to="/flowers" search={{}} className="text-sm tracking-widest uppercase hover:text-accent">View all</Link>
         </div>
         <ul className="mt-8 grid gap-8 md:grid-cols-3">
-          {featured.map(([name, price]) => (
-            <li key={name} className="lift rounded-2xl">
-              <div className="bloom aspect-[4/5] rounded-2xl" aria-hidden />
-              <h3 className="mt-4 text-2xl text-primary">{name}</h3>
-              <p className="text-muted">{price}</p>
-            </li>
-          ))}
+          {products.map((p) => <li key={p.slug}><ProductCard product={p} /></li>)}
         </ul>
       </section>
 
@@ -76,7 +62,7 @@ function Home() {
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-4xl text-primary">For every occasion</h2>
           <ul className="mt-6 flex flex-wrap gap-3">
-            {occasions.map((o) => <li key={o}><a href="#" className="inline-block min-h-10 content-center rounded-full border border-brass bg-background px-5 text-sm hover:border-accent hover:text-accent">{o}</a></li>)}
+            {occasions.map((o) => <li key={o.slug}><Link to="/flowers" search={{ category: o.slug }} className="inline-block min-h-10 content-center rounded-full border border-brass bg-background px-5 text-sm hover:border-accent hover:text-accent">{o.name}</Link></li>)}
           </ul>
         </div>
       </section>

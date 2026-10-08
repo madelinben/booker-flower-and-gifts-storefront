@@ -11,13 +11,26 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DeliveryRouteImport } from './routes/delivery'
+import { Route as DriverRouteImport } from './routes/driver'
+import { Route as FlowersRouteImport } from './routes/flowers'
+import { Route as ThanksRouteImport } from './routes/thanks'
 import { Route as AdminImportRouteImport } from './routes/admin/import'
 import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
+import { Route as ApiRouteMapRouteImport } from './routes/api/route-map'
+import { Route as ApiStopPhotoRouteImport } from './routes/api/stop-photo'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe-webhook'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
+import { Route as DriverIndexRouteImport } from './routes/driver/index'
+import { Route as PhotosSplatRouteImport } from './routes/photos.$'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as DriverRouteIdRouteImport } from './routes/driver/route.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,6 +40,36 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryRoute = DeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverRoute = DriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlowersRoute = FlowersRouteImport.update({
+  id: '/flowers',
+  path: '/flowers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThanksRoute = ThanksRouteImport.update({
+  id: '/thanks',
+  path: '/thanks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminImportRoute = AdminImportRouteImport.update({
@@ -49,6 +92,21 @@ const AdminStaffRoute = AdminStaffRouteImport.update({
   path: '/staff',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiRouteMapRoute = ApiRouteMapRouteImport.update({
+  id: '/api/route-map',
+  path: '/api/route-map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStopPhotoRoute = ApiStopPhotoRouteImport.update({
+  id: '/api/stop-photo',
+  path: '/api/stop-photo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe-webhook',
+  path: '/api/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -64,83 +122,190 @@ const AuthLogoutRoute = AuthLogoutRouteImport.update({
   path: '/auth/logout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DriverIndexRoute = DriverIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DriverRoute,
+} as any)
+const PhotosSplatRoute = PhotosSplatRouteImport.update({
+  id: '/photos/$',
+  path: '/photos/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverRouteIdRoute = DriverRouteIdRouteImport.update({
+  id: '/route/$id',
+  path: '/route/$id',
+  getParentRoute: () => DriverRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cart': typeof CartRoute
+  '/contact': typeof ContactRoute
+  '/delivery': typeof DeliveryRoute
+  '/driver': typeof DriverRouteWithChildren
+  '/flowers': typeof FlowersRoute
+  '/thanks': typeof ThanksRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/api/route-map': typeof ApiRouteMapRoute
+  '/api/stop-photo': typeof ApiStopPhotoRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
+  '/photos/$': typeof PhotosSplatRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/driver/': typeof DriverIndexRoute
+  '/driver/route/$id': typeof DriverRouteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cart': typeof CartRoute
+  '/contact': typeof ContactRoute
+  '/delivery': typeof DeliveryRoute
+  '/flowers': typeof FlowersRoute
+  '/thanks': typeof ThanksRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/api/route-map': typeof ApiRouteMapRoute
+  '/api/stop-photo': typeof ApiStopPhotoRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
+  '/photos/$': typeof PhotosSplatRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/driver': typeof DriverIndexRoute
+  '/driver/route/$id': typeof DriverRouteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cart': typeof CartRoute
+  '/contact': typeof ContactRoute
+  '/delivery': typeof DeliveryRoute
+  '/driver': typeof DriverRouteWithChildren
+  '/flowers': typeof FlowersRoute
+  '/thanks': typeof ThanksRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/api/route-map': typeof ApiRouteMapRoute
+  '/api/stop-photo': typeof ApiStopPhotoRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
+  '/photos/$': typeof PhotosSplatRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/driver/': typeof DriverIndexRoute
+  '/driver/route/$id': typeof DriverRouteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/cart'
+    | '/contact'
+    | '/delivery'
+    | '/driver'
+    | '/flowers'
+    | '/thanks'
     | '/admin/import'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/staff'
+    | '/api/route-map'
+    | '/api/stop-photo'
+    | '/api/stripe-webhook'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/logout'
+    | '/photos/$'
+    | '/product/$slug'
+    | '/driver/'
+    | '/driver/route/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/cart'
+    | '/contact'
+    | '/delivery'
+    | '/flowers'
+    | '/thanks'
     | '/admin/import'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/staff'
+    | '/api/route-map'
+    | '/api/stop-photo'
+    | '/api/stripe-webhook'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/logout'
+    | '/photos/$'
+    | '/product/$slug'
+    | '/driver'
+    | '/driver/route/$id'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/cart'
+    | '/contact'
+    | '/delivery'
+    | '/driver'
+    | '/flowers'
+    | '/thanks'
     | '/admin/import'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/staff'
+    | '/api/route-map'
+    | '/api/stop-photo'
+    | '/api/stripe-webhook'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/logout'
+    | '/photos/$'
+    | '/product/$slug'
+    | '/driver/'
+    | '/driver/route/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  CartRoute: typeof CartRoute
+  ContactRoute: typeof ContactRoute
+  DeliveryRoute: typeof DeliveryRoute
+  DriverRoute: typeof DriverRouteWithChildren
+  FlowersRoute: typeof FlowersRoute
+  ThanksRoute: typeof ThanksRoute
+  ApiRouteMapRoute: typeof ApiRouteMapRoute
+  ApiStopPhotoRoute: typeof ApiStopPhotoRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
+  PhotosSplatRoute: typeof PhotosSplatRoute
+  ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -157,6 +322,48 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery': {
+      id: '/delivery'
+      path: '/delivery'
+      fullPath: '/delivery'
+      preLoaderRoute: typeof DeliveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver': {
+      id: '/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof DriverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flowers': {
+      id: '/flowers'
+      path: '/flowers'
+      fullPath: '/flowers'
+      preLoaderRoute: typeof FlowersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/thanks': {
+      id: '/thanks'
+      path: '/thanks'
+      fullPath: '/thanks'
+      preLoaderRoute: typeof ThanksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/import': {
@@ -187,6 +394,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStaffRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/route-map': {
+      id: '/api/route-map'
+      path: '/api/route-map'
+      fullPath: '/api/route-map'
+      preLoaderRoute: typeof ApiRouteMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stop-photo': {
+      id: '/api/stop-photo'
+      path: '/api/stop-photo'
+      fullPath: '/api/stop-photo'
+      preLoaderRoute: typeof ApiStopPhotoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stripe-webhook': {
+      id: '/api/stripe-webhook'
+      path: '/api/stripe-webhook'
+      fullPath: '/api/stripe-webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -208,6 +436,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLogoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver/': {
+      id: '/driver/'
+      path: '/'
+      fullPath: '/driver/'
+      preLoaderRoute: typeof DriverIndexRouteImport
+      parentRoute: typeof DriverRoute
+    }
+    '/photos/$': {
+      id: '/photos/$'
+      path: '/photos/$'
+      fullPath: '/photos/$'
+      preLoaderRoute: typeof PhotosSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver/route/$id': {
+      id: '/driver/route/$id'
+      path: '/route/$id'
+      fullPath: '/driver/route/$id'
+      preLoaderRoute: typeof DriverRouteIdRouteImport
+      parentRoute: typeof DriverRoute
+    }
   }
 }
 
@@ -227,12 +483,36 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DriverRouteChildren {
+  DriverIndexRoute: typeof DriverIndexRoute
+  DriverRouteIdRoute: typeof DriverRouteIdRoute
+}
+
+const DriverRouteChildren: DriverRouteChildren = {
+  DriverIndexRoute: DriverIndexRoute,
+  DriverRouteIdRoute: DriverRouteIdRoute,
+}
+
+const DriverRouteWithChildren =
+  DriverRoute._addFileChildren(DriverRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  CartRoute: CartRoute,
+  ContactRoute: ContactRoute,
+  DeliveryRoute: DeliveryRoute,
+  DriverRoute: DriverRouteWithChildren,
+  FlowersRoute: FlowersRoute,
+  ThanksRoute: ThanksRoute,
+  ApiRouteMapRoute: ApiRouteMapRoute,
+  ApiStopPhotoRoute: ApiStopPhotoRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
+  PhotosSplatRoute: PhotosSplatRoute,
+  ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

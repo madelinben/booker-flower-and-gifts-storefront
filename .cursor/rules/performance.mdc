@@ -1,87 +1,12 @@
 ---
-description: Core Web Vitals, page speed and bundle-size budgets — hard limits, enforced at build
+description: Performance budgets for the public storefront
 alwaysApply: true
 ---
 
-# Performance and Core Web Vitals
+# Performance
 
-For a shop, speed is revenue and rank. These are limits, not goals. `pnpm check:site` measures the built output and fails on a breach; a change that raises a number must justify it in the PR and update the budget here and in the script in the same commit.
-
-## Targets (mobile, p75 field data; lab Lighthouse mobile as proxy)
-
-| Metric | Limit |
-|---|---|
-| LCP | ≤ 2.5 s (aim ≤ 2.0 s) |
-| INP | ≤ 200 ms |
-| CLS | ≤ 0.1 (aim 0) |
-| TTFB | ≤ 0.8 s — static HTML from the edge |
-| Lighthouse mobile | Performance ≥ 90, SEO 100, Accessibility ≥ 95, Best Practices ≥ 95 |
-
-Measure with `lighthouse_audit` (chrome-devtools MCP) or PageSpeed Insights before calling a page-affecting change done, and after launch use the field data in Search Console.
-
-## Budgets per page (gzip, enforced by `check:site`)
-
-| Asset | Budget |
-|---|---|
-| JavaScript, summed over everything the page loads (scripts, island components, renderers, their static imports) | ≤ 100 KB |
-| CSS (linked + inline) | ≤ 20 KB |
-| HTML document | ≤ 25 KB (≤ 70 KB raw; the hero collage and base-path URLs make the home page the largest) |
-| Preloaded fonts | ≤ 2 files, ≤ 100 KB total |
-| Any single image served | ≤ 200 KB |
-| Third-party origins | 0 (no analytics, chat, tag manager, font CDN) until a rule here allows one |
-
-Staff-only routes (`/keystatic`, `/admin`) are exempt from JS budgets but must never be linked from or share chunks with public pages.
-
-## Where each concern lives
-
-- **Rendering and JS:** this file, `check:site` budgets
-- **robots.txt, sitemap, canonical host:** generated here (`seo.mdc`); the apex→`www` redirect is Cloudflare config
-- **Manual measurement:** GTmetrix, PageSpeed Insights or Lighthouse on the deployed preview. `check:site` guards the build; it does not replace a real-device run
-
-## Rendering
-
-- Static-first: public pages prerender at build. Request-time work only in `src/pages/api/`, `/auth`, `/admin`
-- Content the user came for (heading, when/where/free, product name, price) is in the HTML. No client-only render of primary content
-- No `client:load`. Use `client:idle` / `client:visible`; a new island must name its reason in the PR. Prefer no island: native `<details>`, `<dialog>`, CSS
-- No animation library on public pages. Reveals use CSS transitions + one `IntersectionObserver`. Animate `transform` / `opacity` only; `will-change` only while animating; respect `prefers-reduced-motion`
-- Heavy interactivity (cart dialog, galleries) is lazy: `client:idle` / `client:visible`, never above-the-fold blocking
-- No layout reads (`getBoundingClientRect`, `offsetWidth`) during render or scroll handlers
-
-## LCP
-
-- The LCP element (hero image, product image) is in the HTML, not injected by JS
-- Exactly one image per page may be eager, and it carries `fetchpriority="high"`. Every other `<img>` is `loading="lazy"` and `decoding="async"`
-- Never lazy-load the LCP image; never use a CSS `background-image` for it
-- Hero collage: only the first tile is eager (`fetchpriority="high"`); every other tile is lazy, `alt=""`, one `width` (no multi-width srcset, to keep HTML small)
-
-## CLS
-
-- Every `<img>` has `width` and `height` (or `aspect-ratio`). Product grids reserve their space
-- Fonts: self-hosted, Latin subset only, `font-display: swap`, the two used weights' variable files preloaded in `<head>` with `crossorigin`. No font CDN
-- Nothing is inserted above existing content after load (banners, cart badges reflow-free: reserve their box)
-- Dialogs and toasts overlay; they never push content
-
-## Images
-
-- Local images: `src/assets` + `astro:assets` `<Image>`/`<Picture>` (AVIF/WebP, `srcset`, `sizes`). Files in `public/` must already be optimised and ≤ 200 KB
-- Shopify CDN images: request the size you display via the `?width=` URL parameter with a `srcset` (see `shopify-image-url`); never ship the original
-- Share images: `public/og-default.png` is 1200×630 PNG ≤ 200 KB
-
-## JavaScript hygiene
-
-- No dependency over 10 KB gz in the browser bundle without a PR justification. No `zod`, `lodash`, `moment`, animation libraries in code that ships to public pages — validate by hand or on the server
-- Import deep (`no-barrels.mdc`) so tree-shaking works; no side-effect imports
-- Public pages must work without JS for reading content and following links. Cart/checkout may need JS
-
-## Caching and delivery
-
-- Hashed assets under `/_astro/` are `immutable`; HTML revalidates. Do not break this with query-string cache busting
-- Compression (Brotli) and HTTP/2+ come from Cloudflare; do not inline large assets to "save a request"
-- Preconnect only to origins the page really uses (Shopify CDN on shop pages, checkout domain on the cart)
-
-## Review checks
-
-- `pnpm build && pnpm check:site` green; budgets unchanged or the change is justified
-- New image has dimensions, correct loading attribute, sane weight
-- New dependency: size checked (bundlephobia or `check:site` delta)
-- No new third-party origin
+- Public pages ship no admin or driver code: keep `@dnd-kit` and map code in `/driver` route chunks only (TanStack code-splits per route; do not import them from shared files).
+- Fonts: self-hosted, `latin` subset only where possible; no third-party font CDNs.
+- Images: serve ≤ 200 KB, `loading="lazy"` below the fold, explicit aspect ratio to avoid layout shift.
+- New dependency: justify bundle cost (the Stripe SDK is deliberately avoided: plain `fetch` + one HMAC check).
+- Measure with Lighthouse on a deployed preview before launch (`docs/PREDEPLOY_CHECKLIST.md`).

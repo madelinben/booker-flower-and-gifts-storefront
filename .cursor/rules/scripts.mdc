@@ -13,7 +13,7 @@ One verb. `:target` to refine. Same names in CI where wired, so a script means t
 | `install:clean` | wipe `node_modules` and build cache; reinstall |
 | `dev` | local dev server |
 | `build` | production build |
-| `start` | preview the production build (`astro preview`) |
+| `start` | preview the production build (`vite preview`) |
 | `test` | unit tests |
 | `test:e2e` | end-to-end tests |
 | `lint` / `lint:fix` | linter (root + in-repo packages) |
@@ -21,7 +21,5 @@ One verb. `:target` to refine. Same names in CI where wired, so a script means t
 | `check` | `check:entry-files` → `lint:fix` → `lint` → `typecheck` — the pre-push gate (`dev-checks.mdc`) |
 | `check:entry-files` | fail if `CLAUDE.md` / `AGENTS.md` / `PROJECT_RULES.md` differ |
 | `setup:hooks` | set `core.hooksPath` to the git root's `.githooks`; also run from `setup` and `postinstall` |
-| `check:site` | after `build`: SEO, schema.org, social tags, links, sitemap and size budgets on the built HTML (`seo.mdc`, `performance.mdc`). Needs `node-html-parser` |
-| `pipeline` / `predeploy` | chained gate: branch-base check, typecheck, lint, test, build, check:site, e2e — green before merge |
 
 Keep `typecheck` as its own script even once `pipeline` exists — CI steps run it standalone for fast failure. Merge gate: `predeploy.mdc`.

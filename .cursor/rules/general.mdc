@@ -12,7 +12,7 @@ Use `/caveman ultra` in chat. Build uses `/ponytail`.
 - dynamic unions: exhaustive switch + `assertNever` from `@/utilities/assertNever`
 - KISS minimal diff
 - DRY reuse existing components and helpers
-- Astro `.astro` components by default; React island (`client:*`) only for interactivity (basket, checkout button, FAQ accordion)
+- React components; keep server-only code in server functions and server routes
 - styling: tailwindcss, tailwind-merge, tailwind-variants
 - animation: CSS transitions + one `IntersectionObserver` (no animation library on public pages, `performance.mdc`); honour `prefers-reduced-motion`
 - follow active sub-plan under `docs/feature/*/sub-plans/`

@@ -2,7 +2,7 @@
 description: Interaction and content handling
 globs:
   - **/*.tsx
-  - **/*.astro
+  - **/*.tsx
 alwaysApply: false
 ---
 

@@ -18,6 +18,6 @@ No abbreviations. No clipped coinages (`needsReack` → `needsReapproval`). Spel
 | Model | `{entity}-schema.ts` |
 | API route | `src/pages/api/{capability}.ts` |
 
-Canonical product nouns: **order** (not purchase), **product** (not item or merch), **basket** (not cart), **session** (the weekly run + social, not event), **waiver**. Glossary: `docs/CONTEXT.md`.
+Canonical nouns: **order**, **product**, **variant**, **route**, **stop**, **section**, **driver**. Glossary: `docs/ARCHITECTURE.md`.
 
 Forbidden: `ProductListPage`, `GetProducts`, verb-leading feature folders (`add-to-basket`, `get-orders`). Use noun-first (`basket-manage`).
