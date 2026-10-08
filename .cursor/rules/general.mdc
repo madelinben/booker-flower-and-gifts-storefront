@@ -1,0 +1,19 @@
+---
+description: Always-on coding standards
+alwaysApply: true
+---
+
+Use `/caveman ultra` in chat. Build uses `/ponytail`.
+
+- never `any` or `unknown` — infer from schema, API, package types
+- no `as` on user or API input — parse with the Zod schema that owns the shape (`safeParse`)
+- islands: skip `useCallback` unless proven need; avoid `setTimeout`; limit `useEffect` chains; `useMemo` only for expensive stable data
+- SOLID + one concern per module
+- dynamic unions: exhaustive switch + `assertNever` from `@/utilities/assertNever`
+- KISS minimal diff
+- DRY reuse existing components and helpers
+- Astro `.astro` components by default; React island (`client:*`) only for interactivity (basket, checkout button, FAQ accordion)
+- styling: tailwindcss, tailwind-merge, tailwind-variants
+- animation: CSS transitions + one `IntersectionObserver` (no animation library on public pages, `performance.mdc`); honour `prefers-reduced-motion`
+- follow active sub-plan under `docs/feature/*/sub-plans/`
+- run scripts via pnpm per `.cursor/STRUCTURE.md`

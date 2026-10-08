@@ -1,0 +1,33 @@
+---
+description: Public error pages and validation copy
+globs:
+  - src/pages/404.astro
+  - src/pages/500.astro
+  - **/ErrorPageView.*
+alwaysApply: false
+---
+
+# Error pages + validation
+
+Visitors, not engineers. Status pages + field errors stay plain English.
+
+## Full-page errors (400s / 500s only)
+
+No 2xx/3xx pages. Layout: one large `<h1>`, `max-w-3xl`, left, `<p>` body. No red text. No HTTP codes in UI (`404`, `500`, `Bad Request`). No humour (`Oops`). No blame. No vague “technical difficulties”.
+
+`<title>`: `{H1} – CHSTR Run & Social`.
+
+Always say next step. **Back** (history) and **Home** `/`. Contact `/contact`.
+
+| Case | H1 | Body |
+|---|---|---|
+| Missing URL | `Page not found` | Typed address: check it. Pasted: copy the whole address. Still wrong: home or contact. |
+| Unexpected failure | `Sorry, there is a problem with the site` | Try again later. Basket is saved on this device. Contact us if you need help now. |
+| Checkout cancelled | `Your payment was not taken` | Basket is still saved. Back to basket. |
+
+## Validation + inline errors
+
+Human line first. What to do, not what broke. Provider / Zod JSON / stack / HTTP codes never shown.
+
+- Fields: destructive-token text beside the field. Zod `error` messages set per schema — never default “Too small: expected…”.
+- Persist raw error in logs if needed. Present a human line at the UI.

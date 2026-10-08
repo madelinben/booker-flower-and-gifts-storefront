@@ -1,0 +1,30 @@
+---
+description: Layer law — pages and features compose domains; domains call services; no domain-to-domain
+alwaysApply: true
+---
+
+# Layers
+
+Pages + features compose. Domain never imports sibling domain. Third-party calls live only in `services/integrations`. No `workflows/` folder.
+
+```
+page / feature    → data actions, domain, services
+data actions      → dto, dal, domain, services
+dto               → (pure)
+dal               → services/db, services/integrations
+domain/<entity>   → utilities   (NOT data, NOT services, NOT sibling domain)
+services          → utilities
+```
+
+| Layer | Owns |
+|-------|------|
+| `src/pages/` | Routes + API routes (thin) |
+| `src/features/` | Visitor jobs, UI |
+| `src/data/<Entity>/{dto,dal}` | Transform, D1 (via `services/db`) and Stripe calls (via the registry) |
+| `src/domain/<entity>/` | Order status rules, basket totals |
+| `src/services/db/` | D1 binding wrapper only |
+| `src/services/integrations/` | Closed operation registry + vendor handlers (`external-integrations.mdc`) |
+| `src/stores/` | Client stores (basket) |
+| `src/utilities/` | Pure helpers |
+
+See `docs/ARCHITECTURE.md`.

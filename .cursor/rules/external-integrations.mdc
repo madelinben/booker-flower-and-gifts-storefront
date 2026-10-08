@@ -1,0 +1,31 @@
+---
+description: Closed registry for every 3rd-party call (payment providers, Resend)
+alwaysApply: false
+---
+
+# External integrations (generic pattern)
+
+Any call that leaves the process — payment (Stripe), email (Resend) — goes through **one named, typed operation registry**. No vendor SDK, API key, or `fetch` call to a 3rd party lives outside that registry's own handler modules.
+
+## Shape
+
+Each operation declares: `id`, `provider`, `capability`, `effect` (`read` | `write` | `destructive`), Zod/schema input+output, an allow-list of hosts, and a handler. Application code calls the registry by `id` — never the vendor client directly.
+
+## Payments
+
+Payment vendors implement the `PaymentProvider` port (`services/payments/payment-provider.ts`) and are called only through `payment.*` registry operations. `data/` and `pages/` never name a vendor. Adding one: `docs/PAYMENTS.md`.
+
+## Credentials
+
+- Read via one credential resolver (`requireSetting`) — never a raw env var at a call site
+- Secrets never enter a prompt, a log line, an error message, or persisted call/request JSON — redact before persisting
+
+## Audit
+
+Every registry call should land in a call-log row: provider, operation, effect, status, duration, redacted error. This is the only place that needs to answer "what did we call, when, and did it work."
+
+## Do not
+
+- Import a vendor SDK anywhere outside that vendor's own registry handler
+- Trust a Stripe webhook body before verifying its signature
+- Treat "the demo key is hardcoded in the seed script" as acceptable outside local/dev seed paths

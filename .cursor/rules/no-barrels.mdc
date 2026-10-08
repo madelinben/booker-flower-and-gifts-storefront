@@ -1,0 +1,23 @@
+---
+description: Deep imports only — no barrels (tree-shaking)
+alwaysApply: true
+---
+
+# No barrels
+
+Import every public symbol from **its own file**. Never a folder `index`. Each component is a folder: `{Name}/{Name}.tsx` (or `.astro`).
+
+```ts
+// yes
+import { BasketButton } from '@/features/basket-manage/views/components/BasketButton/BasketButton';
+
+// no
+import { BasketButton } from '@/features/basket-manage';
+import { BasketButton } from '@/features/basket-manage/views/components';
+```
+
+Law:
+
+- No `index.ts` / `index.tsx` re-export files anywhere under `src/`.
+- No `export * from` / re-export barrels.
+- Lint: `no-restricted-syntax` blocks `export * from` (`eslint.config.mjs`).

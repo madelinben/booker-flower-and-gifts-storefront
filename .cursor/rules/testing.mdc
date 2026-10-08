@@ -1,0 +1,23 @@
+---
+description: Testing
+globs:
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - e2e/**
+alwaysApply: false
+---
+
+Unit: Vitest. E2E: Playwright against `astro preview` (port 4321).
+
+Colocate unit tests in a `tests/` folder next to the module — same hierarchy as `hooks/` / `views/` / `models/`. Never `foo.test.ts` beside `foo.ts`.
+
+```text
+domain/basket/basket-total.ts
+domain/basket/tests/basket-total.test.ts
+
+features/basket-manage/tests/basket-store.test.ts
+```
+
+Test real behaviour: order status values, basket totals, checkout payload shape.
+
+One smoke test per module is fine. Do not delete for being minimal.

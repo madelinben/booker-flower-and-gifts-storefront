@@ -1,0 +1,50 @@
+name: CI cloudflare
+
+on:
+  push:
+    branches: [main]
+    paths: ['chstr-run-and-social-cloudflare/**', '.github/workflows/ci-cloudflare.yml']
+  pull_request:
+    paths: ['chstr-run-and-social-cloudflare/**', '.github/workflows/ci-cloudflare.yml']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: chstr-run-and-social-cloudflare
+    env:
+      # Placeholder values so the build compiles without host env. Mirror the app's .env.example.
+      SITE_ORIGIN: http://localhost:4321
+      PAYMENT_PROVIDERS: stripe
+      STRIPE_SECRET_KEY: sk_test_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_placeholder
+      RESEND_API_KEY: re_placeholder
+      STAFF_NOTIFICATION_EMAIL: staff@example.invalid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: chstr-run-and-social-cloudflare/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: chstr-run-and-social-cloudflare/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+      - name: Site quality (SEO, schema.org, budgets)
+        run: pnpm check:site

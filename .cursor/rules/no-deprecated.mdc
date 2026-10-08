@@ -1,0 +1,56 @@
+---
+description: Remove deprecated code; keep project clean; no ID aliases
+alwaysApply: true
+---
+
+# No deprecated — keep clean
+
+Delete dead / deprecated / superseded paths in the same change that replaces them. Do not leave shims, dual APIs, or “remove later” leftovers.
+
+## Remove
+
+- `@deprecated` symbols, unused exports, orphan files
+- Legacy routes once redirects proven (or delete redirect when callers gone)
+- Commented-out code, unused deps, unused env keys / docs for removed features
+- Compatibility wrappers after one call-site cutover
+- **ID / name alias maps** (`Record<OldId, NewId>`, `canonicalX(id)` that rewrites, “also accept foo”)
+
+## Forbidden
+
+- New `@deprecated` without same-PR deletion plan
+- Keeping old + new “just in case”
+- `// TODO: remove` without ticket + near-term delete
+- Barrel re-exports of removed modules
+- Alias tables like:
+
+```ts
+// FORBIDDEN
+const ORDER_STATUS_ALIASES = { paid: 'PAID_UNFULFILLED' };
+function canonicalOrderStatus(status: string) {
+  return ORDER_STATUS_ALIASES[status] ?? status;
+}
+```
+
+- Accepting legacy strings from D1 / Stripe / URLs and silently rewriting to current ids
+- Dual keys for the same product or order status
+
+## One source of truth
+
+- Order statuses, product ids, route paths appear **once** — the const / CMS row
+- Unknown id → **fail loud** (throw / Zod reject), never remap
+
+## When touching code
+
+1. Grep callers of old symbol / route / env / id string
+2. Cut every caller to the current id
+3. Delete alias map / shim / dual key
+4. Drop docs / STRUCTURE / CONFIG lines that teach the old id
+
+Prefer delete over comment. Prefer one API over soft migration layers.
+
+## Greenfield — no backward compatibility
+
+- No runtime acceptance of old URL or query params. Unknown params are ignored; old names are not forwarded.
+- No soft-migration of old order rows in read paths. Readers talk to the current post type only.
+- No “legacy” handlers in the integration registry. Delete the old file in the same change.
+- Fail loud on unknown order status or operation ids.

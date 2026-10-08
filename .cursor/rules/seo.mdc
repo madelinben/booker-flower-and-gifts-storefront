@@ -1,0 +1,95 @@
+---
+description: SEO, page metadata, Open Graph and schema.org contract — every indexable page, enforced at build
+alwaysApply: true
+---
+
+# SEO and structured data
+
+Organic search and link previews are the shop's front door. A page that ships without this is not done. `pnpm check:site` (in `predeploy` and CI) fails the build on any breach below; the rule and the check are one contract — change both together.
+
+## Priorities (when trade-offs appear)
+
+1. **Crawlability and indexation** — can Google reach, render and index it? (static HTML, sitemap, no accidental `noindex`)
+2. **Technical foundations** — fast, mobile-friendly, HTTPS, one canonical host (`performance.mdc`)
+3. **On-page** — titles, descriptions, headings, internal links
+4. **Content quality** — real facts, depth, answers the searcher's intent
+5. **Authority** — internal linking; external links are out of scope here
+
+## Every page, no exceptions
+
+Pages render through `PageLayout.astro`, which renders `PageSeo.astro`. Never write a `<head>` tag by hand in a page. A page passes the layout its facts; the layout emits the tags.
+
+| Requirement | Rule |
+|---|---|
+| `<html lang>` | `en-GB` |
+| `<title>` | 15–60 chars, unique site-wide, descriptive (what the page is, not "Home"), primary keyword near the start, brand suffix ` – CHSTR Run & Social` unless the page sets `absoluteTitle` |
+| `meta description` | 70–160 chars, unique site-wide, written for a searcher, one clear benefit, no keyword stuffing |
+| `link rel=canonical` | One, absolute, equals `site` + the page's own path with a trailing slash. Never a query string |
+| `meta viewport` | `width=device-width, initial-scale=1` — never `maximum-scale`, never `user-scalable=no` |
+| Open Graph | `og:title`, `og:description`, `og:type`, `og:url` (= canonical), `og:image` (absolute, 1200×630), `og:image:alt`, `og:site_name`, `og:locale=en_GB` |
+| Twitter | `twitter:card=summary_large_image` (title/description/image fall back to OG) |
+| Headings | Exactly one `<h1>`; levels never skip (h1 → h2 → h3) |
+| JSON-LD | One `<script type="application/ld+json">` holding an `@graph`; valid JSON, `@context` `https://schema.org`, every node has `@type` |
+| Favicon set | SVG favicon + 180px `apple-touch-icon` |
+
+## Page types and their schema.org nodes
+
+Every page's graph carries `Organization` (`SportsClub`), `WebSite` and a `WebPage` (or the subtype below) that `isPartOf` the site and `breadcrumb`s to a `BreadcrumbList`, linked by stable `@id`s (`<origin>/#organization`, `<origin>/#website`, `<url>#webpage`). Then, by page type:
+
+| Page | Extra nodes (required properties) |
+|---|---|
+| Home `/` | `Event` for the weekly session: `name`, `startDate` (next Monday 18:30 Europe/London, computed at build), `eventSchedule` (`Schedule`, weekly, Monday), `location` (`Place` + `PostalAddress`), `isAccessibleForFree: true`, `offers` (price 0 GBP), `organizer`, `eventStatus`, `eventAttendanceMode` |
+| `/faqs` | `FAQPage` with every question from the content collection; answers are plain text of the visible answer — never text that is not on the page |
+| `/waiver` | `WebPage` |
+| `/contact` | `ContactPage`; `Organization.contactPoint` and `sameAs` (every social profile) |
+| `/merchandise` | `CollectionPage` + `ItemList` (`itemListElement` `ListItem` with `position`, `url`, `name`, `image`) |
+| `/merchandise/<product>` | `Product`: `name`, `description`, `image[]` (absolute), `sku` or `url`, `brand`, `offers` (`Offer`: `price`, `priceCurrency` `GBP`, `availability` from real stock, `url`, `itemCondition`). Price and availability must equal what the page shows. Variants → one `Offer` each |
+| Not indexed (checkout thanks, 404, `/admin`, `/auth`, `/keystatic`, `/api`) | `robots` `noindex, nofollow` on pages; excluded from the sitemap; `Disallow`ed in `robots.txt`. Server-rendered staff pages set `noindex` too |
+
+Never mark up content that is not visible on the page, never invent ratings or reviews, never add `aggregateRating`/`review` without real, displayed reviews. Facts (address, hours, handles) come from one config source, not retyped per page.
+
+## Out-of-stock products
+
+An out-of-stock product page stays indexed and returns 200: say "Sold out" on the page, disable the add-to-cart control, and mark the `Offer` `https://schema.org/OutOfStock`. Do not `noindex` or 404 it. A permanently discontinued product is redirected to `/merchandise/`.
+
+## Host and URL consistency
+
+One host: `www.<domain>` is canonical. The apex redirects (301) to it at Cloudflare. HTTP redirects to HTTPS. Trailing slash is always present on page URLs. Internal links use the canonical form so there are no redirect hops.
+
+## Site-level files
+
+- `site` in `astro.config.mjs` is the production origin (from `SITE_ORIGIN`). Production builds run with `SEO_STRICT=1`, which fails if it is `localhost` or a `.example` placeholder
+- `/robots.txt` (generated): allow `/`, disallow `/admin /keystatic /api/ /auth/`, `Sitemap:` line
+- `/sitemap-index.xml` from `@astrojs/sitemap`: every indexable page, none of the noindex ones
+- `public/og-default.png` (1200×630) is the fallback share image; products use their own image (≥ 1200 px wide where the source allows)
+
+## Content rules that affect ranking
+
+- The primary keyword appears in the `<h1>` and in the first 100 words of the copy
+- Image filenames are descriptive and hyphenated (`monday-run-chester.webp`, not `IMG_4021.jpg`)
+- Every `<img>` has meaningful `alt` (empty `alt=""` only for purely decorative images), explicit `width` and `height`
+- Internal links are plain `<a href>` to real built pages; the check fails on a broken internal link
+- Link text says where it goes ("Sign the waiver", not "click here")
+- One topic per URL. No duplicate titles, descriptions or H1 text across pages
+- URLs: lowercase, hyphenated, stable. A renamed URL needs a redirect, never a 404
+- Copy states the real facts (when, where, free, how pickup works). No placeholder text in indexable pages
+
+## Adding a page — checklist
+
+1. Page uses `PageLayout` with `title`, `description`, and (if not the default share image) `image` + `imageAlt`
+2. Pass `breadcrumbs`, and `schema` nodes for its type from `features/site-seo/utilities/`
+3. Add the route to the page-type table above if it is a new type, and teach `scripts/check-site-quality.mjs` its required nodes
+4. `pnpm build && pnpm check:site` green
+
+## Audits
+
+When reviewing a page or the site, report each finding as: **Issue**, **Impact** (high/medium/low), **Evidence** (file, URL, or measured value), **Fix**, **Priority**. Use code and metadata inspection and `pnpm check:site`; do not claim Search Console or ranking data you do not have. Validate schema in Google's Rich Results Test before launch (needs the live URL).
+
+## Do not
+
+- Hand-write `<title>`, meta, canonical, OG or JSON-LD in a page
+- Reuse the home title/description on another page
+- Ship a page whose OG image is a relative path or an SVG (crawlers reject it)
+- Add `noindex` to a public page to silence the check
+- Use `client:*` to render content that search engines need; content is in the static HTML
+- Put two conflicting nodes of the same type on one page (one `Product` per product page, one `FAQPage`, one `Event` per real event)

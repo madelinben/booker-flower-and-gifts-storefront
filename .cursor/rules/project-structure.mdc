@@ -1,0 +1,50 @@
+---
+description: Repo placement and import boundaries
+alwaysApply: true
+---
+
+See `docs/ARCHITECTURE.md`. Gates in `.cursor/STRUCTURE.md`.
+
+## Repo layout (single Astro app at root)
+
+Product code lives under `src/`. Alias `@/` → `src/`.
+
+| Path | Role |
+|------|------|
+| `src/pages/` | Astro routes (thin; compose features). `src/pages/api/` = checkout + Stripe webhook |
+| `src/features/` | Visitor jobs (`<entity>-<objective>/`) + `site-shell` chrome |
+| `src/data/` | `data/<Entity>/{dto,dal}` + capability actions |
+| `src/domain/` | Business rules — no UI |
+| `src/services/` | `services/integrations` registry |
+| `src/utilities/` | Shared pure helpers |
+| `src/stores/` | Client stores (Nano Stores) |
+
+No `packages/` workspaces: no sibling consumer, no shared-package tier.
+
+## Feature MVC (`src/features/<entity>-<objective>/`)
+
+Noun-first: `product-browse`, `order-checkout`.
+
+```text
+features/{entity}-{objective}/
+  models/              Zod for this job only
+  views/components/    presentational TSX / Astro
+  hooks/               non-form UI hooks
+  api/                 client calls to our own API routes
+  utilities/           pure helpers — not in views/
+  types/               only if not inferable from models
+  tests/               Vitest for this job — never `*.test.ts` beside source
+  config.ts            optional
+```
+
+Omit empty dirs. Add `views/pages/`, `controllers/`, `views/phases/` only when a feature needs them. Shared chrome stays `features/site-shell`. Shared business rules stay `domain/`. Mutation handlers: `data/<Capability>/`. Thin. Business rules in `domain/`.
+
+## Import law
+
+Enforced in `eslint.config.mjs` (`import/no-cycle`, `no-restricted-imports`). Matches `.cursor/rules/layers.mdc`.
+
+Forbidden: domain → feature. domain → services. feature → sibling feature internals. Barrel `index.ts` re-exports. Vendor SDK import outside `services/integrations`.
+
+Pages may **compose** multiple features. Features must not import sibling internals.
+
+PR: correct layer, no forbidden imports, no new barrels, `pnpm lint` passes.

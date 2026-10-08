@@ -1,0 +1,43 @@
+---
+description: Enforced dev checks — one `check` script, three enforcement layers (git hook, CI, host checks)
+alwaysApply: true
+---
+
+# Dev checks (enforced, not advisory)
+
+A check that only lives in a doc gets skipped — by people, by agents. Every gate below is wired to something that fails the push or the deploy.
+
+## The scripts
+
+| Script | Runs | When |
+|---|---|---|
+| `typecheck` | type check, no emit | standalone — hosts look for this exact name |
+| `lint` / `lint:fix` | linter | standalone |
+| `check` | `check:entry-files` → `lint:fix` → `lint` → `typecheck` | before every push |
+| `check:site` | built-HTML SEO + performance budgets (`seo.mdc`, `performance.mdc`) | after `build`, in `pipeline` and CI |
+| `pipeline` / `predeploy` | `check` + test + build + `check:site` + e2e (see `predeploy.mdc`) | before merge to `main` |
+
+## Three enforcement layers
+
+| Layer | Mechanism | Catches |
+|---|---|---|
+| Local | `.githooks/pre-push` (git root, shared by both apps) runs `check` in each app; `core.hooksPath` set by `setup` (`scripts/setup-git-hooks.mjs`, also on `postinstall`) | lint/type errors before they cost a CI or deploy run |
+| CI | `../.github/workflows/ci-cloudflare.yml` — install `--frozen-lockfile` → typecheck → lint → build on every PR and push to `main` | anything the hook skipped (`--no-verify`, web-editor commits, AI-builder commits) |
+| Host | Cloudflare Pages build runs `pnpm build` on every push/PR preview — see `docs/environment/cloudflare.md` | deploy-time gate; a broken build never goes live |
+
+Hook + CI + host call the **same script names** — never inline a different command in one layer.
+
+## Iteration vs. push
+
+- While iterating on UI: don't run the gates after every edit — `dev` only.
+- Run `check` before push, `/review` and `/push`-style skills; run `pipeline` before merge.
+- Stage any `lint:fix` diffs — never push with lint failures.
+- Never bypass with `--no-verify`, `continue-on-error`, `// @ts-ignore`/`eslint-disable` to get green. Fix or ask.
+- Never lower a threshold (bundle size, coverage, lint severity) without explicit user OK.
+
+## Hook rules
+
+- Hooks live in `.githooks/` at the git root (committed), never `.git/hooks/`.
+- Hook exits 0 immediately when `CI`, `GITHUB_ACTIONS`, or `CF_PAGES` is set.
+- Hook stays fast: `check` only. Build/e2e belong to `pipeline` and CI.
+- `setup-git-hooks.mjs` is a no-op without `.git` (tarball installs, Cloudflare Pages) and never fails install.

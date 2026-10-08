@@ -1,0 +1,10 @@
+#!/bin/sh
+# pre-push: the same gate CI runs, for both apps. Skipped in CI/host builds.
+if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ] || [ -n "$CF_PAGES" ] || [ -n "$WORKERS_CI" ]; then
+  exit 0
+fi
+root="$(git rev-parse --show-toplevel)"
+for app in chstr-run-and-social-cloudflare chstr-run-and-social-shopify; do
+  echo "pre-push: pnpm check in $app"
+  (cd "$root/$app" && pnpm check) || exit 1
+done

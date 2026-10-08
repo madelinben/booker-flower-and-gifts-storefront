@@ -1,0 +1,23 @@
+---
+description: Naming conventions
+alwaysApply: true
+---
+
+Under 7 words per identifier. Full English words only.
+
+No abbreviations. No clipped coinages (`needsReack` → `needsReapproval`). Spell the word (`reapproval`, `configuration`, `identifier`) — do not invent a shorter stem.
+
+| Kind | Pattern |
+|------|---------|
+| Feature folder | `{entity}-{objective}` (`product-browse`, `order-checkout`, `faq-browse`) |
+| Browse page component | `{Entity}BrowsePage` |
+| Detail page component | `{Entity}DetailPage` |
+| Server read | `get{Entity}Server` / `get{Entities}Server` |
+| Client read | `get{Entity}Client` |
+| Mutations | `create{Entity}`, `update{Entity}` |
+| Model | `{entity}-schema.ts` |
+| API route | `src/pages/api/{capability}.ts` |
+
+Canonical product nouns: **order** (not purchase), **product** (not item or merch), **basket** (not cart), **session** (the weekly run + social, not event), **waiver**. Glossary: `docs/CONTEXT.md`.
+
+Forbidden: `ProductListPage`, `GetProducts`, verb-leading feature folders (`add-to-basket`, `get-orders`). Use noun-first (`basket-manage`).

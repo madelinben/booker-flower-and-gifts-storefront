@@ -1,0 +1,56 @@
+---
+description: Project objective, import law, on-demand rule table
+alwaysApply: true
+---
+
+# chstr-run-and-social-cloudflare
+
+Website for CHSTR Run & Social, a free, inclusive run and social club in Chester (Mondays 18:30, The Architect; running, football, netball, social nights). Visitors are new and existing runners. Every page earns its place by answering *when, where, free* fast, getting a new runner to the waiver, or selling merch with the least friction. Playful bubble/cartoon look, scroll-revealed vertical panels. Lowest possible running cost.
+
+## Workspaces & import law
+
+- **App root (this folder)** — product: `src/pages/`, `src/features/`, `src/data/`, `src/domain/`, `src/content/`, `src/services/`, `src/stores/`, `src/utilities/`
+- No shared packages, no `packages/*` (single standalone app)
+- Products + FAQs: `src/content/` (Keystatic). Orders: Cloudflare D1. No separate CMS server
+
+Layer boundaries + `import/no-cycle` in the lint config (`layers.mdc`):
+
+```
+page → feature, data, domain, services
+data → domain, services
+domain → utilities (NOT data, NOT services)
+services → utilities
+```
+
+Feature folder (`src/features/<entity>-<objective>/`, noun-first: `product-browse` not `browse-products`): `models/ views/components/ hooks/ api/ utilities/ types/ tests/ config.ts`. Omit empty dirs. Route handlers in `src/pages/api/` stay thin; business rules in `domain/`.
+
+Canonical nouns: order, product, basket, session, waiver. Glossary: `docs/CONTEXT.md`.
+
+## Merchandise (KISS)
+
+No user accounts. Basket in `localStorage` (Nano Stores). Checkout = Stripe Checkout Session from `src/pages/api/`. Webhook `checkout.session.completed` inserts an order into D1. Order status is the five-value enum in `domain/order/`. Staff email on new `PAID_UNFULFILLED`.
+
+## Always-on web rules
+
+`seo.mdc` (metadata, Open Graph, schema.org) and `performance.mdc` (Core Web Vitals, bundle budgets) apply to every page and are enforced by `pnpm check:site` after `pnpm build`.
+
+## On-demand rules (read before touching matching paths)
+
+| File | Scope |
+|---|---|
+| `external-integrations.mdc` | Any Stripe / Resend call |
+| `database.mdc` | `src/data/**`, `src/content/**`, `migrations/**`, orders |
+| `theme.mdc` | styles, tokens, motion |
+| `copy.mdc` | UI text |
+| `accessibility.mdc` | components, pages |
+| `interaction.mdc` | components, pages |
+| `error-pages.mdc` | 404 / 500 pages |
+| `testing.mdc` | tests, e2e |
+| `generated.mdc` | `generated/**` |
+
+## Gates before merge
+
+- `pnpm check` green on every push (pre-push hook + CI + host build)
+- `pnpm predeploy` green before merge
+- Sub-plan checkbox synced (if using the master/sub-plan SDLC flow)
+- After push: PR body filled from `.github/pull_request_template.md`

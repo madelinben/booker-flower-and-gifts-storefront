@@ -1,0 +1,43 @@
+---
+description: User-facing copy
+globs:
+  - **/*.tsx
+  - **/*.astro
+alwaysApply: false
+---
+
+# Copy
+
+Visitors are runners, not engineers. UI text is product, not debug output. Playful tone allowed (see `theme.mdc`) — never at the cost of clarity.
+
+## Never leak the implementation
+
+- no raw enum / slug / status / identifier values — map through a label constant (`READY_FOR_PICKUP` → `Ready to collect at Monday’s run`)
+- no shell commands, file paths, env var names, or CMS field names
+- no stack traces or provider error strings verbatim — summarise
+- pair a raw id with its human name when the id must show (`Order 1000000`)
+- full-page errors: **error-pages** rule (sentence-case H1, no HTTP codes, no red)
+
+## States name the fix
+
+- errors say what to do next, not only what broke
+- empty states say what will fill them and offer the action (empty basket → link to merchandise)
+- disabled controls say why, next to the control
+- every list has designed empty, loading, and error copy
+
+## Voice
+
+- second person, active voice, present tense
+- Title Case for headings, buttons, labels; sentence case for body and helper text
+- numerals for counts (`3 items`)
+- specific button labels naming the action (`Pay With Stripe`, not `Continue` / `Submit` / `OK`)
+- no `Are you sure?` — state the consequence
+
+## Characters
+
+- `…` not `...`
+- curly quotes `’` `“` `”`
+- non-breaking space between value and unit or key (`18:30 Mon`)
+- loading text and placeholders end with `…`
+- placeholders show an example, not a restatement of the label
+- `Intl.DateTimeFormat` / `Intl.NumberFormat` — never hand-rolled formats

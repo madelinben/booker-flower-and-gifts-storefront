@@ -1,0 +1,42 @@
+---
+description: Cloudflare D1 for orders, content collections for catalogue — runtime config SSOT, timestamps
+globs:
+  - src/data/**
+  - src/services/db/**
+  - src/content/**
+  - migrations/**
+alwaysApply: false
+---
+
+**Where things live**
+- Products + FAQs: Astro content collections in `src/content/` (schema in `src/content.config.ts`). Staff edit through the Keystatic UI; every change is a git commit that rebuilds the site.
+- Orders: Cloudflare D1 (SQLite), binding `DB`. Only `src/services/db/` touches the binding; `data/*/dal` call it.
+- Payment truth: Stripe. Fulfilment truth: D1 `orders.status`.
+
+**Types**
+- PK: `INTEGER PRIMARY KEY AUTOINCREMENT`
+- No SQL `FOREIGN KEY` constraints, no `ON DELETE CASCADE`. Parent ids are plain integer columns; integrity is app code + unique indexes.
+- Status: `TEXT` with a `CHECK` listing `ORDER_STATUSES` — the const in `domain/order/order-status.ts` and the migration must match
+- Timestamps: UTC ISO strings, set explicitly from the app with `new Date().toISOString()` on insert and update — never a SQL default
+
+**DAL**
+- named columns only, no `select *`
+- Stripe session id is the idempotency key (`UNIQUE`) — a replayed webhook must not create a second order
+- `db.batch()` for multi-table writes (order + lines)
+- explicit archive/delete in app code
+
+**Migrations**
+- plain SQL files in `migrations/`, numbered, human-reviewed
+- apply: `pnpm db:migrate:local`, `pnpm db:migrate`
+- greenfield: drop + recreate OK; no dual-write aliases
+
+## Runtime config is content, not a TypeScript fallback
+
+Anything staff change without a developer — catalogue, prices, sizes, FAQ copy — lives in `src/content/`. Never hardcode a fallback catalogue in TypeScript. Missing or invalid entry → **fail the build** (Zod schema in `content.config.ts`).
+
+- Checkout re-reads the price from the collection server-side; never trust a client price
+- Unknown order status → reject, never remap
+
+## Timestamps are UTC, always
+
+Never store a formatted date. Format at the render boundary with `Intl.DateTimeFormat`, `timeZone: 'Europe/London'` for staff views.

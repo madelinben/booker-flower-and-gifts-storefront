@@ -1,0 +1,16 @@
+---
+description: Deploy target + local dev environment — read the docs listed here before deploy, CI, or infra work
+alwaysApply: true
+---
+
+# Project environment
+
+Chosen at intake (`docs/DEPLOYMENT_STRATEGY.md` § 1, `docs/CONFIG.md` § Stack). Read the docs below before touching deploy config, CI, env, or infra. Environments not listed here were not chosen — ignore any guidance for them.
+
+| Environment | Doc | Applies to |
+|---|---|---|
+| Cloudflare Workers (static assets) | `docs/environment/cloudflare.md` | Deploy, DNS, env, preview vs production, webhook endpoint |
+| D1 + content + admin | `docs/environment/cloudflare-data.md` | Orders database, Keystatic, Google-sign-in-protected admin |
+| GitHub | `docs/environment/github.md` | PR CLI, Actions CI |
+
+Generic gates that apply to every environment: `dev-checks.mdc`, `predeploy.mdc`, `pull-requests.mdc`.
